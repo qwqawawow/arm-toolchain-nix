@@ -9,22 +9,22 @@
   python3,
   git,
   ninja,
-  llvmPackages_20,
+  llvmPackages_latest,
   applyPatches,
-  breakpointHook,
 }:
 let
+  tag = "release-20.1.0-ATfE";
   arm-toolchain = fetchFromGitHub {
     owner = "arm";
     repo = "arm-toolchain";
-    rev = "6d70ed16afe13e31cdf4e3fab2788432521045d0";
-    hash = "sha256-KGpSAcBklDjO95s77nWTPCCf8KtLLly8gB34Xh5GAYs=";
+    rev = "refs/tags/${tag}";
+    hash = "sha256-i6x6yysroxWtPx8EG9DU+9O8HWwCQaJteYJ9R8HDpqI=";
   };
   picolibc = fetchFromGitHub {
     owner = "picolibc";
     repo = "picolibc";
-    rev = "fb36d6cebb7b5abd7a9497ddda9b7627b7cd0624";
-    hash = "sha256-HeTjHnSdgvxKXrM/ZjpNJimEC6oIUK/qJfJtJo6HAI8=";
+    rev = "refs/tags/1.8.9";
+    hash = "sha256-W1zK9mLMfi5pbOpbSLxiB2qKdiyNjOSQu96NM94/fcY=";
   };
   picolibc-patched = applyPatches {
     src = picolibc;
@@ -38,12 +38,12 @@ let
     arm-toolchain: ${arm-toolchain.rev}
     picolibc: ${picolibc.rev}
   '';
-  llvm = llvmPackages_20.llvm;
+  llvm = llvmPackages_latest.llvm;
 in
 
 clangStdenv.mkDerivation rec {
   pname = "arm-toolchain";
-  version = "";
+  version = "release-20.1.0-ATfE";
   src = arm-toolchain;
 
   #++ lib.optional (!isDarwin) "-DBUILD_SHARED_LIBS=ON";
@@ -82,26 +82,13 @@ clangStdenv.mkDerivation rec {
   ];
   installPhase = ''
     runHook preInstall
-
     cmake . --install-prefix $out
     ninja install-llvm-toolchain
     mv $out/docs $doc
     mv $out/samples $samples
-
     runHook postInstall
   '';
 
-  # stripExclude = [
-  #   "CHANGELOG.md"
-  #   "README.md"
-  #   "THIRD-PARTY-LICENSES.txt"
-  #   "docs/*"
-  #   "include/*"
-  #   "lib/*"
-  #   "samples/*"
-  #   "third-party-licenses/*"
-  #   "version.txt"
-  # ];
   cmakeFlags = [
     "-DLLVM_TABLEGEN_EXE=${llvm.out}/bin/llvm-tblgen"
     "-DLLVM_TOOLS_BINARY_DIR=${llvm.out}/bin"

@@ -50,14 +50,13 @@
           #ncmpcpp-clang = (pkgs.callPackage ./ncmpcpp.nix { stdenv = pkgs.clangStdenv; });
           #ncmpcpp = (pkgs.callPackage ./ncmpcpp.nix { });
           #        cling = (pkgs.callPackage ./cling.nix { });
-          arm-toolchain = (pkgs.callPackage ./default.nix { });
+          arm-toolchain = (pkgs-m.callPackage ./default.nix { });
           #          keyviz = (pkgs.callPackage ./keyviz.nix { flutter = pkgs.flutter323; });
           #   boost = pkgs-m.boost;
 
           #
           #
           # stdenv = if stdenv.isDarwin then overrideSDK stdenv "11.0" else stdenv;
-          #
           #
           #
           #
@@ -77,7 +76,7 @@
       githubActions = nix-github-actions.lib.mkGithubMatrix {
         checks = nixpkgs.lib.getAttrs [
           "aarch64-darwin"
-          "x86_64-darwin"
+          "x86_64-linux"
         ] self.packages;
       };
     };
